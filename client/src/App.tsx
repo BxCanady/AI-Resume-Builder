@@ -1,22 +1,23 @@
-import react, { usestate } from 'react';
-import { browserrouter, routes, route } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { NextUIProvider } from '@nextui-org/react';
 
-import home from "./components/home";
+import Home from "./components/Home";
 
-
-const app: react.fc = () => {
-  const [result, setresult] = usestate<any>({});
+const App: React.FC = () => {
+  const [result, setResult] = useState<any>({});
 
   return (
-    <div>
-      <browserrouter>
-        <routes>
-          <route path="/" element={<home setresult={setresult} />} />
-
-        </routes>
-      </browserrouter>
-    </div>
+    <NextUIProvider>
+      <div>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home setResult={setResult} />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    </NextUIProvider>
   );
 };
 
-export default app;
+export default App;

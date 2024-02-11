@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Loading from './Loading';
 import axios from 'axios';
-import { Button, Input, Spacer } from '@nextui-org/react';
+import { Button, Input, Spacer } from '@nextui-org/react'; // Import Button and other components from NextUI
+import './Home.css'
 
 interface CompanyInfo {
     name: string;
@@ -62,109 +63,127 @@ const Home: React.FC<{ setResult: Function }> = ({ setResult }) => {
     }
 
     return (
-        <div className="app">
-            <h1>Resume Builder</h1>
-            <p>Generate a resume with ChatGPT in few seconds</p>
-            <form onSubmit={handleFormSubmit} method="POST" encType="multipart/form-data">
-                <label htmlFor="fullName">Enter your full name</label>
-                <Input
-                    type="text"
-                    required
-                    name="fullName"
-                    id="fullName"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                />
-                <Spacer y={1} />
-                <div>
-                    <label htmlFor="currentPosition">Current Position</label>
+        <div className="app-container">
+            <div className="app">
+                <h1>Resume Builder</h1>
+                <p>Generate a resume with ChatGPT in few seconds</p>
+                <form onSubmit={handleFormSubmit} method="POST" encType="multipart/form-data">
+                    <label htmlFor="fullName">Enter your full name</label>
                     <Input
                         type="text"
                         required
-                        name="currentPosition"
-                        className="currentInput"
-                        value={currentPosition}
-                        onChange={(e) => setCurrentPosition(e.target.value)}
+                        name="fullName"
+                        id="fullName"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
                     />
-                </div>
-                <Spacer y={1} />
-                <div>
-                    <label htmlFor="currentLength">For how long? (year)</label>
-                    <Input
-                        type="number"
-                        required
-                        name="currentLength"
-                        className="currentInput"
-                        value={currentLength.toString()}
-                        onChange={(e) => setCurrentLength(Number(e.target.value))}
-                    />
-                </div>
-                <Spacer y={1} />
-                <div>
-                    <label htmlFor="currentTechnologies">Technologies used</label>
-                    <Input
-                        type="text"
-                        required
-                        name="currentTechnologies"
-                        className="currentInput"
-                        value={currentTechnologies}
-                        onChange={(e) => setCurrentTechnologies(e.target.value)}
-                    />
-                </div>
-                <Spacer y={2} />
-                <label htmlFor="photo">Upload your headshot image</label>
-                <input
-                    type="file"
-                    name="photo"
-                    required
-                    id="photo"
-                    accept="image/x-png,image/jpeg"
-                    onChange={(e) => setHeadshot(e.target.files?.[0] || null)}
-                />
-
-
-                <h3>Companies you've worked at</h3>
-
-                {companyInfo.map((company, index) => (
-                    <div key={index}>
-                        <div className="companies">
-                            <label htmlFor="name">Company Name</label>
-                            <Input
-                                type="text"
-                                name="name"
-                                required
-                                onChange={(e) => handleUpdateCompany(e, index)}
-                            />
-                        </div>
-                        <Spacer y={1} />
-                        <div className="companies">
-                            <label htmlFor="position">Position Held</label>
-                            <Input
-                                type="text"
-                                name="position"
-                                required
-                                onChange={(e) => handleUpdateCompany(e, index)}
-                            />
-                        </div>
-                        <Spacer y={1} />
-                        <div className="btn__group">
-                            {companyInfo.length - 1 === index && companyInfo.length < 4 && (
-                                <Button id="addBtn" onClick={handleAddCompany}>
-                                    Add
-                                </Button>
-                            )}
-                            {companyInfo.length > 1 && (
-                                <Button id="deleteBtn" onClick={() => handleRemoveCompany(index)}>
-                                    Del
-                                </Button>
-                            )}
-                        </div>
-                        <Spacer y={2} />
+                    <Spacer y={1} />
+                    <div>
+                        <label htmlFor="currentPosition">Current Position</label>
+                        <Input
+                            type="text"
+                            required
+                            name="currentPosition"
+                            className="currentInput"
+                            value={currentPosition}
+                            onChange={(e) => setCurrentPosition(e.target.value)}
+                        />
                     </div>
-                ))}
+                    <Spacer y={1} />
+                    <div>
+                        <label htmlFor="currentLength">For how long? (year)</label>
+                        <Input
+                            type="number"
+                            required
+                            name="currentLength"
+                            className="currentInput"
+                            value={currentLength.toString()}
+                            onChange={(e) => setCurrentLength(Number(e.target.value))}
+                        />
+                    </div>
+                    <Spacer y={1} />
+                    <div>
+                        <label htmlFor="currentTechnologies">Technologies used</label>
+                        <Input
+                            type="text"
+                            required
+                            name="currentTechnologies"
+                            className="currentInput"
+                            value={currentTechnologies}
+                            onChange={(e) => setCurrentTechnologies(e.target.value)}
+                        />
+                    </div>
+                    <Spacer y={2} />
+                    <label htmlFor="photo">Upload your headshot image</label>
+                    <input
+                        type="file"
+                        name="photo"
+                        required
+                        id="photo"
+                        accept="image/x-png,image/jpeg"
+                        onChange={(e) => setHeadshot(e.target.files?.[0] || null)}
+                    />
 
-                <Button type="submit">CREATE RESUME</Button>
-            </form>
+
+                    <h3>Companies you've worked at</h3>
+
+                    {companyInfo.map((company, index) => (
+                        <div key={index}>
+                            <div className="companies">
+                                <label htmlFor="name">Company Name</label>
+                                <Input
+                                    type="text"
+                                    name="name"
+                                    required
+                                    onChange={(e) => handleUpdateCompany(e, index)}
+                                />
+                            </div>
+                            <Spacer y={1} />
+                            <div className="companies">
+                                <label htmlFor="position">Position Held</label>
+                                <Input
+                                    type="text"
+                                    name="position"
+                                    required
+                                    onChange={(e) => handleUpdateCompany(e, index)}
+                                />
+                            </div>
+                            <Spacer y={1} />
+                            <div className="btn__group">
+                                {companyInfo.length - 1 === index && companyInfo.length < 4 && (
+                                    <Button
+                                        radius="full"
+                                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
+                                        id="addBtn"
+                                        onClick={handleAddCompany}
+                                    >
+                                        Add
+                                    </Button>
+                                )}
+                                {companyInfo.length > 1 && (
+                                    <Button
+                                        radius="full"
+                                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
+                                        id="deleteBtn"
+                                        onClick={() => handleRemoveCompany(index)}
+                                    >
+                                        Del
+                                    </Button>
+                                )}
+                            </div>
+                            <Spacer y={2} />
+                        </div>
+                    ))}
+
+                    <Button
+                        type="submit"
+                        radius="full"
+                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
+                    >
+                        CREATE RESUME
+                    </Button>
+                </form>
+            </div>
         </div>
     );
 };
