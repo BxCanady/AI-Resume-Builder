@@ -1,23 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, Dispatch, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Loading from './Loading';
 import axios from 'axios';
-import { Button, Input, Spacer } from '@nextui-org/react'; // Import Button and other components from NextUI
-import './Home.css'
+import './Home.css';
 
 interface CompanyInfo {
     name: string;
     position: string;
 }
 
-const Home: React.FC<{ setResult: Function }> = ({ setResult }) => {
+interface HomeProps {
+    setResult: Dispatch<SetStateAction<any>>;
+}
+
+const Home: React.FC<HomeProps> = ({ setResult }) => {
     const [fullName, setFullName] = useState<string>('');
     const [currentPosition, setCurrentPosition] = useState<string>('');
     const [currentLength, setCurrentLength] = useState<number>(1);
-    const [currentTechnologies, setCurrentTechnologies] = useState<string>('');
     const [headshot, setHeadshot] = useState<File | null>(null);
     const [companyInfo, setCompanyInfo] = useState<CompanyInfo[]>([{ name: '', position: '' }]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [skills, setSkills] = useState<string[]>([]);
     const navigate = useNavigate();
 
     const handleAddCompany = () => setCompanyInfo([...companyInfo, { name: '', position: '' }]);
@@ -35,6 +36,15 @@ const Home: React.FC<{ setResult: Function }> = ({ setResult }) => {
         setCompanyInfo(list);
     };
 
+    const handleAddSkill = () => {
+        if (skills.length < 5) {
+            const newSkill = ''; // Replace '' with the value entered for the new skill
+            if (newSkill.trim() !== '') {
+                setSkills(prevSkills => [...prevSkills, newSkill]);
+            }
+        }
+    };
+
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -43,145 +53,132 @@ const Home: React.FC<{ setResult: Function }> = ({ setResult }) => {
         formData.append('fullName', fullName);
         formData.append('currentPosition', currentPosition);
         formData.append('currentLength', String(currentLength));
-        formData.append('currentTechnologies', currentTechnologies);
+        formData.append('currentTechnologies', JSON.stringify(skills));
         formData.append('workHistory', JSON.stringify(companyInfo));
 
         axios
             .post('http://localhost:4000/resume/create', formData, {})
             .then((res) => {
                 if (res.data.message) {
-                    setResult(res.data.data);
+                    setResult(res.data); // Pass result data to setResult
                     navigate('/resume');
                 }
             })
             .catch((err) => console.error(err));
-        setLoading(true);
     };
-
-    if (loading) {
-        return <Loading />;
-    }
 
     return (
         <div className="app-container">
             <div className="app">
-                <h1>Resume Builder</h1>
-                <p>Generate a resume with ChatGPT in few seconds</p>
+                <h1 style={{ textAlign: "center" }}>Resume Builder</h1>
                 <form onSubmit={handleFormSubmit} method="POST" encType="multipart/form-data">
-                    <label htmlFor="fullName">Enter your full name</label>
-                    <Input
+                    <label htmlFor="fullName" className="label">Enter your full name</label>
+                    <input
                         type="text"
                         required
                         name="fullName"
                         id="fullName"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
+                        className="input-field"
                     />
-                    <Spacer y={1} />
-                    <div>
-                        <label htmlFor="currentPosition">Current Position</label>
-                        <Input
+                    <div className="mb-4">
+                        <label htmlFor="currentPosition" className="block mb-2">Current Position</label>
+                        <input
                             type="text"
-                            required
+                            className="border border-pearl-blue rounded-lg px-4 py-2 w-full"
                             name="currentPosition"
-                            className="currentInput"
                             value={currentPosition}
                             onChange={(e) => setCurrentPosition(e.target.value)}
                         />
                     </div>
-                    <Spacer y={1} />
-                    <div>
-                        <label htmlFor="currentLength">For how long? (year)</label>
-                        <Input
+                    <div className="mb-4">
+                        <label htmlFor="currentLength" className="block mb-2">For how long? (year)</label>
+                        <input
                             type="number"
-                            required
+                            className="border border-pearl-blue rounded-lg px-4 py-2 w-full"
                             name="currentLength"
-                            className="currentInput"
                             value={currentLength.toString()}
                             onChange={(e) => setCurrentLength(Number(e.target.value))}
                         />
                     </div>
-                    <Spacer y={1} />
-                    <div>
-                        <label htmlFor="currentTechnologies">Technologies used</label>
-                        <Input
-                            type="text"
-                            required
-                            name="currentTechnologies"
-                            className="currentInput"
-                            value={currentTechnologies}
-                            onChange={(e) => setCurrentTechnologies(e.target.value)}
-                        />
+                    <div className="mb-4">
+                        <label htmlFor="currentTechnologies" className="block mb-2">Enter up to <strong>5 skills</strong></label>
+                        <div className="flex">
+                            <input
+                                type="text"
+                                className="border border-pearl-blue rounded-l-lg px-4 py-2 flex-1"
+                                name="skills"
+                                value={skills.join(',')} // Join skills array to display comma-separated values
+                                onChange={(e) => setSkills(e.target.value.split(','))} // Split value back to array
+                            />
+                            <button
+                                type="button"
+                                className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-r-lg"
+                                onClick={handleAddSkill}
+                            >
+                                Add Skill
+                            </button>
+                        </div>
                     </div>
-                    <Spacer y={2} />
-                    <label htmlFor="photo">Upload your headshot image</label>
+                    <label htmlFor="photo" className="block mb-2">Upload your headshot image (optional)</label>
                     <input
                         type="file"
                         name="photo"
-                        required
                         id="photo"
                         accept="image/x-png,image/jpeg"
                         onChange={(e) => setHeadshot(e.target.files?.[0] || null)}
                     />
-
-
-                    <h3>Companies you've worked at</h3>
-
+                    <p className="optional-msg">* You can leave this blank if you don't want to upload a headshot.</p>
+                    <h3 className="text-2xl mb-4">Companies you've worked at</h3>
                     {companyInfo.map((company, index) => (
-                        <div key={index}>
-                            <div className="companies">
-                                <label htmlFor="name">Company Name</label>
-                                <Input
+                        <div key={index} className="mb-4">
+                            <div className="mb-4">
+                                <label htmlFor="name" className="block mb-2">Company Name</label>
+                                <input
                                     type="text"
+                                    className="border border-pearl-blue rounded-lg px-4 py-2 w-full"
                                     name="name"
                                     required
                                     onChange={(e) => handleUpdateCompany(e, index)}
                                 />
                             </div>
-                            <Spacer y={1} />
-                            <div className="companies">
-                                <label htmlFor="position">Position Held</label>
-                                <Input
+                            <div className="mb-4">
+                                <label htmlFor="position" className="block mb-2">Position Held</label>
+                                <input
                                     type="text"
+                                    className="border border-pearl-blue rounded-lg px-4 py-2 w-full"
                                     name="position"
                                     required
                                     onChange={(e) => handleUpdateCompany(e, index)}
                                 />
                             </div>
-                            <Spacer y={1} />
-                            <div className="btn__group">
+                            <div className="flex">
+                                <button
+                                    type="button"
+                                    className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-lg mr-2"
+                                    onClick={() => handleRemoveCompany(index)}
+                                >
+                                    Delete
+                                </button>
                                 {companyInfo.length - 1 === index && companyInfo.length < 4 && (
-                                    <Button
-                                        radius="full"
-                                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
-                                        id="addBtn"
+                                    <button
+                                        type="button"
+                                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-lg"
                                         onClick={handleAddCompany}
                                     >
                                         Add
-                                    </Button>
-                                )}
-                                {companyInfo.length > 1 && (
-                                    <Button
-                                        radius="full"
-                                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
-                                        id="deleteBtn"
-                                        onClick={() => handleRemoveCompany(index)}
-                                    >
-                                        Del
-                                    </Button>
+                                    </button>
                                 )}
                             </div>
-                            <Spacer y={2} />
                         </div>
                     ))}
-
-                    <Button
+                    <button
                         type="submit"
-                        radius="full"
-                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
+                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-lg"
                     >
                         CREATE RESUME
-                    </Button>
+                    </button>
                 </form>
             </div>
         </div>
