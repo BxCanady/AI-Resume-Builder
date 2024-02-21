@@ -1,6 +1,7 @@
-import React, { useState, Dispatch, SetStateAction } from 'react';
+import React, { useState, ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Skills from './Skills';
 import './Home.css';
 
 interface CompanyInfo {
@@ -29,19 +30,18 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
         setCompanyInfo(list);
     };
 
-    const handleUpdateCompany = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const handleUpdateCompany = (e: ChangeEvent<HTMLInputElement>, index: number) => {
         const { name, value } = e.target;
         const list = [...companyInfo];
         list[index][name as keyof CompanyInfo] = value;
         setCompanyInfo(list);
     };
 
-    const handleAddSkill = () => {
+    const handleAddSkill = (newSkill: string) => {
         if (skills.length < 5) {
-            const newSkill = ''; // Replace '' with the value entered for the new skill
-            if (newSkill.trim() !== '') {
-                setSkills(prevSkills => [...prevSkills, newSkill]);
-            }
+            setSkills(prevSkills => [...prevSkills, newSkill]);
+        } else {
+            console.log("You can only add up to 5 skills.");
         }
     };
 
@@ -60,7 +60,7 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
             .post('http://localhost:4000/resume/create', formData, {})
             .then((res) => {
                 if (res.data.message) {
-                    setResult(res.data); // Pass result data to setResult
+                    setResult(res.data);
                     navigate('/resume');
                 }
             })
@@ -70,7 +70,8 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
     return (
         <div className="app-container">
             <div className="app">
-                <h1 style={{ textAlign: "center" }}>Resume Builder</h1>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Resume Builder</h1>
+                <p style={{ textAlign: "center" }}>Generate a resume with AI in a few seconds</p>
                 <form onSubmit={handleFormSubmit} method="POST" encType="multipart/form-data">
                     <label htmlFor="fullName" className="label">Enter your full name</label>
                     <input
@@ -81,8 +82,10 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         className="input-field"
+                        style={{ marginBottom: "10px" }}
                     />
-                    <div className="mb-4">
+                    {/* Add spacing below each input */}
+                    <div className="mb-4" style={{ marginBottom: "20px" }}>
                         <label htmlFor="currentPosition" className="block mb-2">Current Position</label>
                         <input
                             type="text"
@@ -92,7 +95,7 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
                             onChange={(e) => setCurrentPosition(e.target.value)}
                         />
                     </div>
-                    <div className="mb-4">
+                    <div className="mb-4" style={{ marginBottom: "20px" }}>
                         <label htmlFor="currentLength" className="block mb-2">For how long? (year)</label>
                         <input
                             type="number"
@@ -102,25 +105,8 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
                             onChange={(e) => setCurrentLength(Number(e.target.value))}
                         />
                     </div>
-                    <div className="mb-4">
-                        <label htmlFor="currentTechnologies" className="block mb-2">Enter up to <strong>5 skills</strong></label>
-                        <div className="flex">
-                            <input
-                                type="text"
-                                className="border border-pearl-blue rounded-l-lg px-4 py-2 flex-1"
-                                name="skills"
-                                value={skills.join(',')} // Join skills array to display comma-separated values
-                                onChange={(e) => setSkills(e.target.value.split(','))} // Split value back to array
-                            />
-                            <button
-                                type="button"
-                                className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-r-lg"
-                                onClick={handleAddSkill}
-                            >
-                                Add Skill
-                            </button>
-                        </div>
-                    </div>
+                    {/* Render the Skills component with spacing */}
+                    <Skills skills={skills} setSkills={setSkills} handleAddSkill={(newSkill: string) => handleAddSkill(newSkill)} />
                     <label htmlFor="photo" className="block mb-2">Upload your headshot image (optional)</label>
                     <input
                         type="file"
@@ -128,8 +114,9 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
                         id="photo"
                         accept="image/x-png,image/jpeg"
                         onChange={(e) => setHeadshot(e.target.files?.[0] || null)}
+                        style={{ marginBottom: "20px" }}
                     />
-                    <p className="optional-msg">* You can leave this blank if you don't want to upload a headshot.</p>
+                    <p className="optional-msg" style={{ marginBottom: "20px" }}>* You can leave this blank if you don't want to upload a headshot.</p>
                     <h3 className="text-2xl mb-4">Companies you've worked at</h3>
                     {companyInfo.map((company, index) => (
                         <div key={index} className="mb-4">
