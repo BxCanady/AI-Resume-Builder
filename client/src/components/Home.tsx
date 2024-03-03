@@ -70,89 +70,93 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
     return (
         <div className="app-container">
             <div className="app">
-                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Resume Builder</h1>
-                <p style={{ textAlign: "center" }}>Generate a resume with AI in a few seconds</p>
+                <h1 className="title"><strong>Resume Builder</strong></h1>
+                <p className="subtitle">Generate a resume with AI in a few seconds</p>
                 <form onSubmit={handleFormSubmit} method="POST" encType="multipart/form-data">
-                    <label htmlFor="fullName" className="label">Enter your full name</label>
-                    <input
-                        type="text"
-                        required
-                        name="fullName"
-                        id="fullName"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        className="input-field"
-                        style={{ marginBottom: "10px" }}
-                    />
-                    {/* Add spacing below each input */}
-                    <div className="mb-4" style={{ marginBottom: "20px" }}>
-                        <label htmlFor="currentPosition" className="block mb-2">Current Position</label>
+                    <div className="form-group">
+                        <label htmlFor="fullName" className="label">Full Name</label>
                         <input
                             type="text"
-                            className="border border-pearl-blue rounded-lg px-4 py-2 w-full"
+                            required
+                            name="fullName"
+                            id="fullName"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            className="input-field"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="currentPosition" className="label">Current Position</label>
+                        <input
+                            type="text"
+                            required
                             name="currentPosition"
                             value={currentPosition}
                             onChange={(e) => setCurrentPosition(e.target.value)}
+                            className="input-field"
                         />
                     </div>
-                    <div className="mb-4" style={{ marginBottom: "20px" }}>
-                        <label htmlFor="currentLength" className="block mb-2">For how long? (year)</label>
+                    <div className="form-group">
+                        <label htmlFor="currentLength" className="label">Years of Experience</label>
                         <input
                             type="number"
-                            className="border border-pearl-blue rounded-lg px-4 py-2 w-full"
+                            required
                             name="currentLength"
                             value={currentLength.toString()}
                             onChange={(e) => setCurrentLength(Number(e.target.value))}
+                            className="input-field"
                         />
                     </div>
-                    {/* Render the Skills component with spacing */}
                     <Skills skills={skills} setSkills={setSkills} handleAddSkill={(newSkill: string) => handleAddSkill(newSkill)} />
-                    <label htmlFor="photo" className="block mb-2">Upload your headshot image (optional)</label>
-                    <input
-                        type="file"
-                        name="photo"
-                        id="photo"
-                        accept="image/x-png,image/jpeg"
-                        onChange={(e) => setHeadshot(e.target.files?.[0] || null)}
-                        style={{ marginBottom: "20px" }}
-                    />
-                    <p className="optional-msg" style={{ marginBottom: "20px" }}>* You can leave this blank if you don't want to upload a headshot.</p>
-                    <h3 className="text-2xl mb-4">Companies you've worked at</h3>
+                    <div className="form-group">
+                        <label htmlFor="photo" className="label">Upload Headshot (optional)</label>
+                        <input
+                            type="file"
+                            name="photo"
+                            id="photo"
+                            accept="image/x-png,image/jpeg"
+                            onChange={(e) => setHeadshot(e.target.files?.[0] || null)}
+                        />
+                        <p className="optional-msg">* You can leave this blank if you don't want to upload a headshot.</p>
+                    </div>
+                    <h3 className="section-heading">Work History</h3>
                     {companyInfo.map((company, index) => (
-                        <div key={index} className="mb-4">
-                            <div className="mb-4">
-                                <label htmlFor="name" className="block mb-2">Company Name</label>
+                        <div key={index} className="company-info">
+                            <div className="form-group">
+                                <label htmlFor={`companyName${index}`} className="label">Company Name</label>
                                 <input
                                     type="text"
-                                    className="border border-pearl-blue rounded-lg px-4 py-2 w-full"
-                                    name="name"
                                     required
+                                    name={`companyName${index}`}
+                                    value={company.name}
                                     onChange={(e) => handleUpdateCompany(e, index)}
+                                    className="input-field"
                                 />
                             </div>
-                            <div className="mb-4">
-                                <label htmlFor="position" className="block mb-2">Position Held</label>
+                            <div className="form-group">
+                                <label htmlFor={`position${index}`} className="label">Position</label>
                                 <input
                                     type="text"
-                                    className="border border-pearl-blue rounded-lg px-4 py-2 w-full"
-                                    name="position"
                                     required
+                                    name={`position${index}`}
+                                    value={company.position}
                                     onChange={(e) => handleUpdateCompany(e, index)}
+                                    className="input-field"
                                 />
                             </div>
-                            <div className="flex">
+                            <div className="button-group">
                                 <button
                                     type="button"
-                                    className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-lg mr-2"
                                     onClick={() => handleRemoveCompany(index)}
+                                    className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-r-lg mt-1"
                                 >
                                     Delete
                                 </button>
                                 {companyInfo.length - 1 === index && companyInfo.length < 4 && (
                                     <button
                                         type="button"
-                                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-lg"
                                         onClick={handleAddCompany}
+                                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-r-lg mt-1"
                                     >
                                         Add
                                     </button>
@@ -160,12 +164,7 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
                             </div>
                         </div>
                     ))}
-                    <button
-                        type="submit"
-                        className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white px-4 py-2 rounded-lg"
-                    >
-                        CREATE RESUME
-                    </button>
+                    <button type="submit" className="submit-btn">Create Resume</button>
                 </form>
             </div>
         </div>
