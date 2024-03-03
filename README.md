@@ -8,4 +8,5 @@ Typescript
  Node
  MongoDB
  Tailwind
- 
+ ![image](https://github.com/BxCanady/AI-Resume-Builder/assets/64870171/4702145b-7b12-4325-93bb-8ecd3051c3c4)
+
