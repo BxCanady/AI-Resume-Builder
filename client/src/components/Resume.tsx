@@ -6,19 +6,19 @@ interface ResumeProps {
     result: {
         fullName: string;
         currentPosition: string;
-        currentTechnologies: string;
+        currentTechnologies: string[];
         currentLength: number;
-        image_url: string;
+        image_url?: string;
         objective: string;
-        workHistory: WorkHistoryItem[]; // Define this type
-        // Add other properties as needed
+        workHistory: WorkHistoryItem[];
     };
 }
 
 interface WorkHistoryItem {
     name: string;
     position: string;
-    // Add other properties as needed
+    startDate: string;
+    endDate: string;
 }
 
 const Resume: React.FC<ResumeProps> = ({ result }) => {
@@ -46,19 +46,21 @@ const Resume: React.FC<ResumeProps> = ({ result }) => {
                     <div>
                         <h1>{result.fullName}</h1>
                         <p className='resumeTitle headerTitle'>
-                            {result.currentPosition} ({result.currentTechnologies})
+                            {result.currentPosition} ({result.currentTechnologies.join(', ')})
                         </p>
                         <p className='resumeTitle'>
                             {result.currentLength} year(s) work experience
                         </p>
                     </div>
-                    <div>
-                        <img
-                            src={result.image_url}
-                            alt={result.fullName}
-                            className='resumeImage'
-                        />
-                    </div>
+                    {result.image_url && (
+                        <div>
+                            <img
+                                src={result.image_url}
+                                alt={result.fullName}
+                                className='resumeImage'
+                            />
+                        </div>
+                    )}
                 </header>
                 <div className='resumeBody'>
                     <div>
@@ -72,12 +74,13 @@ const Resume: React.FC<ResumeProps> = ({ result }) => {
                     </div>
                     <div>
                         <h2 className='resumeBodyTitle'>WORK HISTORY</h2>
-                        {result.workHistory.map((work: WorkHistoryItem) => (
-                            <p className='resumeBodyContent' key={work.name}>
-                                <span style={{ fontWeight: "bold" }}>{work.name}</span> -{" "}
-                                {work.position}
-                                {/* Add more details about each work history item */}
-                            </p>
+                        {result.workHistory && result.workHistory.map((work: WorkHistoryItem) => (
+                            <div key={work.name}>
+                                <p className='resumeBodyContent' style={{ fontWeight: "bold" }}>{work.name}</p>
+                                <p className='resumeBodyContent'>{work.position}</p>
+                                <p className='resumeBodyContent'>{`Start Date: ${work.startDate}`}</p>
+                                <p className='resumeBodyContent'>{`End Date: ${work.endDate}`}</p>
+                            </div>
                         ))}
                         {/* Add other sections (education, skills, etc.) similarly */}
                     </div>
