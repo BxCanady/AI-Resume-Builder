@@ -3,7 +3,7 @@ const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const openai = require('openai');
-require('dotenv').config(); // Load environment variables from .env file
+
 const app = express();
 const PORT = process.env.PORT || 4000; // Use PORT environment variable or default to 4000
 
@@ -65,25 +65,30 @@ app.post("/resume/create", upload.single("headshotImage"), async (req, res) => {
 // Function to generate a resume using OpenAI
 async function generateResume(formData, apiKey) {
     try {
+        // Convert formData.workHistory to an array if it's not already
+        const workHistory = Array.isArray(formData.workHistory) ? formData.workHistory : [formData.workHistory];
+        const technologies = Array.isArray(formData.currentTechnologies) ? formData.currentTechnologies : [formData.currentTechnologies];
+
         // Construct prompt for generating resume
         let prompt = `Generate a resume for ${formData.fullName}, who currently works as a ${formData.currentPosition} with ${formData.currentLength} years of experience.\n\n`;
-        prompt += `Skills: ${formData.currentTechnologies.join(', ')}\n\n`;
+        prompt += `Skills: ${technologies.join(', ')}\n\n`;
         prompt += `Work History:\n`;
-        formData.workHistory.forEach((company) => {
+        workHistory.forEach((company) => {
             prompt += `- ${company.name}: ${company.position}\n`;
         });
+        
         // Create OpenAI client with user's API key
         const openaiClient = new openai.OpenAI(apiKey);
 
         // Call OpenAI API to generate resume
         const response = await openaiClient.completions.create({
-            model: "text-davinci-003",
+            model: "gpt-3.5-turbo",
             prompt: prompt,
             temperature: 0.6,
             max_tokens: 250,
             top_p: 1,
             frequency_penalty: 1,
-            presence_penalty: 1,d
+            presence_penalty: 1,
         });
 
         // Return generated resume
