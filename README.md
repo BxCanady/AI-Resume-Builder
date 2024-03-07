@@ -9,5 +9,4 @@ Typescript
  MongoDB
  Tailwind
 
-
-[React App.pdf](https://github.com/BxCanady/AI-Resume-Builder/files/14522901/React.App.pdf)
+![image](https://github.com/BxCanady/AI-Resume-Builder/assets/64870171/91046bf0-466f-4dc7-8ec4-12303a6a27a6)
