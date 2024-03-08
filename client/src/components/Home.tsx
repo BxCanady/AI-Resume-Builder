@@ -21,6 +21,7 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
     const [headshot, setHeadshot] = useState<File | null>(null);
     const [companyInfo, setCompanyInfo] = useState<CompanyInfo[]>([{ name: '', position: '' }]);
     const [skills, setSkills] = useState<string[]>([]);
+    const [error, setError] = useState<any>(null); // Add this line
     const navigate = useNavigate();
 
     const handleAddCompany = () => setCompanyInfo([...companyInfo, { name: '', position: '' }]);
@@ -31,13 +32,11 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
         setCompanyInfo(list);
     };
 
-    const handleUpdateCompany = (e: ChangeEvent<HTMLInputElement>, index: number, field: string) => {
-        const { value } = e.target;
-        setCompanyInfo(prevCompanyInfo => {
-            const updatedCompanyInfo = [...prevCompanyInfo];
-            updatedCompanyInfo[index] = { ...updatedCompanyInfo[index], [field]: value };
-            return updatedCompanyInfo;
-        });
+    const handleUpdateCompany = (e: ChangeEvent<HTMLInputElement>, index: number) => {
+        const { name, value } = e.target;
+        const list = [...companyInfo];
+        list[index][name as keyof CompanyInfo] = value;
+        setCompanyInfo(list);
     };
 
     const handleAddSkill = (newSkill: string) => {
@@ -48,37 +47,41 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
         }
     };
 
-    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-    
+
         const formData = new FormData();
-    
-        // Append headshotImage only if a file is selected
-        if (headshot) {
-            formData.append('headshotImage', headshot as Blob, (headshot as File).name);
-        }
-    
+        formData.append('headshotImage', headshot as Blob, (headshot as File).name);
         formData.append('fullName', fullName);
         formData.append('currentPosition', currentPosition);
         formData.append('currentLength', String(currentLength));
         formData.append('currentTechnologies', JSON.stringify(skills));
         formData.append('workHistory', JSON.stringify(companyInfo));
-    
-        try {
-            const response = await axios.post('https://sturdy-winner-7wvw6xr9r4w2pr5x-4000.app.github.dev/resume/create', formData);
-            setResult(response.data);
-            navigate('/resume');
-        } catch (error) {
-            console.error('Error submitting form:', error);
-        }
+
+        axios
+            .post('http://localhost:4000/resume/create', formData, {})
+            .then((res) => {
+                if (res.data.message) {
+                    setResult(res.data);
+                    navigate('/resume');
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+                // Display server down message
+                setError({ error: 'Failed to connect to the server. Please try again later.' });
+            });
     };
+
     return (
         <div className="app-container">
             <div className="app">
-                <header>
-                    <h1><strong>Resume Builder</strong></h1>
-                </header>
-                <h1 className="subtitle"><strong>Generate a resume with AI in a few seconds</strong></h1>
+                <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Resume Builder</h1>
+                <p style={{ textAlign: "center" }}>Generate a resume with AI in a few seconds</p>
+                
+                {/* Display error message if server is down */}
+                {error && <p className="error-message">{error.error}</p>}
+                
                 <form onSubmit={handleFormSubmit} method="POST" encType="multipart/form-data">
                     <div className="form-group">
                         <label htmlFor="fullName" className="label">Full Name</label>
@@ -114,7 +117,7 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
                             className="input-field"
                         />
                     </div>
-                   <div><Skills skills={skills} setSkills={setSkills} handleAddSkill={(newSkill: string) => handleAddSkill(newSkill)} /></div>
+                    <div><Skills skills={skills} setSkills={setSkills} handleAddSkill={(newSkill: string) => handleAddSkill(newSkill)} /></div>
                     <div className="form-group">
                         <label htmlFor="photo" className="label">Upload Headshot (optional)</label>
                         <input
