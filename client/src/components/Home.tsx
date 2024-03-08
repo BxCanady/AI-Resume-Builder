@@ -52,9 +52,12 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
         e.preventDefault();
     
         const formData = new FormData();
+    
+        // Append headshotImage only if a file is selected
         if (headshot) {
             formData.append('headshotImage', headshot as Blob, (headshot as File).name);
         }
+    
         formData.append('fullName', fullName);
         formData.append('currentPosition', currentPosition);
         formData.append('currentLength', String(currentLength));
@@ -62,7 +65,7 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
         formData.append('workHistory', JSON.stringify(companyInfo));
     
         try {
-            const response = await axios.post('http://localhost:4000/resume/create', formData);
+            const response = await axios.post('https://sturdy-winner-7wvw6xr9r4w2pr5x-4000.app.github.dev/resume/create', formData);
             setResult(response.data);
             navigate('/resume');
         } catch (error) {
@@ -111,7 +114,7 @@ const Home: React.FC<HomeProps> = ({ setResult }) => {
                             className="input-field"
                         />
                     </div>
-                    <Skills skills={skills} setSkills={setSkills} handleAddSkill={(newSkill: string) => handleAddSkill(newSkill)} />
+                   <div><Skills skills={skills} setSkills={setSkills} handleAddSkill={(newSkill: string) => handleAddSkill(newSkill)} /></div>
                     <div className="form-group">
                         <label htmlFor="photo" className="label">Upload Headshot (optional)</label>
                         <input
